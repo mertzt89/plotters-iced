@@ -28,7 +28,7 @@ use std::{
 use sysinfo::{CpuRefreshKind, RefreshKind, System};
 
 const PLOT_SECONDS: usize = 60; //1 min
-const TITLE_FONT_SIZE: u16 = 22;
+const TITLE_FONT_SIZE: u32 = 22;
 const SAMPLE_EVERY: Duration = Duration::from_millis(1000);
 
 const FONT_BOLD: Font = Font {
@@ -38,14 +38,15 @@ const FONT_BOLD: Font = Font {
 };
 
 fn main() {
-    iced::application("CPU Monitor Example", State::update, State::view)
+    iced::application(State::new, State::update, State::view)
+        .title("CPU Monitor Example")
         .antialiasing(true)
         .default_font(Font::with_name("Noto Sans"))
         .subscription(|_| {
             const FPS: u64 = 50;
             iced::time::every(Duration::from_millis(1000 / FPS)).map(|_| Message::Tick)
         })
-        .run_with(State::new)
+        .run()
         .unwrap();
 }
 
