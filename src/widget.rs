@@ -10,10 +10,10 @@ use iced_widget::{
     canvas::Event,
     core::{
         event,
-        mouse::Cursor,
+        mouse::{self, Cursor},
         renderer::Style,
         widget::{tree, Tree},
-        Element, Layout, Length, Rectangle, Shell, Size, Widget,
+        Clipboard, Element, Layout, Length, Rectangle, Shell, Size, Widget,
     },
     text::Shaping,
 };
@@ -114,22 +114,22 @@ where
     }
 
     #[inline]
-    fn on_event(
+    fn update(
         &mut self,
         tree: &mut Tree,
-        event: iced_widget::core::Event,
+        event: &Event,
         layout: Layout<'_>,
-        cursor: Cursor,
+        cursor: mouse::Cursor,
         _renderer: &Renderer,
-        _clipboard: &mut dyn iced_widget::core::Clipboard,
+        _clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
-        _rectangle: &Rectangle,
-    ) -> event::Status {
+        _viewport: &Rectangle,
+    ) {
         let bounds = layout.bounds();
         let canvas_event = match event {
-            iced_widget::core::Event::Mouse(mouse_event) => Some(Event::Mouse(mouse_event)),
+            iced_widget::core::Event::Mouse(mouse_event) => Some(Event::Mouse(*mouse_event)),
             iced_widget::core::Event::Keyboard(keyboard_event) => {
-                Some(Event::Keyboard(keyboard_event))
+                Some(Event::Keyboard(keyboard_event.clone()))
             }
             _ => None,
         };
@@ -141,9 +141,7 @@ where
             if let Some(message) = message {
                 shell.publish(message);
             }
-            return event_status;
         }
-        event::Status::Ignored
     }
 
     fn mouse_interaction(
